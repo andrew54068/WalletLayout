@@ -32,11 +32,10 @@ class CryptoCardCell: UICollectionViewCell {
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         contentView.layer.cornerRadius = 10
+        contentView.layer.masksToBounds = true
     }
 
     private func setupUI() {
-        contentView.backgroundColor = .gray
-
         addSubview(balanceLabel)
         balanceLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(10)
