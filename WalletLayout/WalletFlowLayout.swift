@@ -15,6 +15,7 @@ protocol WalletFlowLayoutDelegate: UICollectionViewDelegateFlowLayout {
 final class WalletFlowLayout: UICollectionViewLayout {
 
     private var attributes: [[UICollectionViewLayoutAttributes]] = []
+    private var originalAttributes: [[UICollectionViewLayoutAttributes]] = []
 
     private weak var layoutDelegate: WalletFlowLayoutDelegate?
 
@@ -88,6 +89,10 @@ final class WalletFlowLayout: UICollectionViewLayout {
             attributes.append(tempAttributes)
         }
 
+        if originalAttributes.isEmpty {
+            originalAttributes = attributes
+        }
+
     }
 
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
@@ -97,7 +102,53 @@ final class WalletFlowLayout: UICollectionViewLayout {
     override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         return attributes[indexPath.section][indexPath.item]
     }
+
+    func installGesture() {
+        let panGestureRecognizer: UIPanGestureRecognizer = .init(target: self, action: #selector(movingCard(_:)))
+        panGestureRecognizer.delegate = self
+        self.collectionView?.addGestureRecognizer(panGestureRecognizer)
+    }
+
+    @objc
+    private func movingCard(_ gesture: UIPanGestureRecognizer) {
+        guard let collectionView = collectionView else { return }
+
+        let translation: CGPoint = gesture.translation(in: collectionView)
+        let velocity: CGPoint = gesture.velocity(in: collectionView)
+
+        let section: Int = 0
+
+        guard let numberOfItem: Int = collectionView.dataSource?.collectionView(collectionView, numberOfItemsInSection: section) else { return }
+        for item in 1 ..< numberOfItem {
+
+            let offset: CGFloat
+            if velocity.y >= 0 {
+                offset = (CGFloat(item) * sqrt(abs(translation.y)) * 2)
+            } else {
+                offset = (CGFloat(item) * -sqrt(abs(translation.y)) * 2)
+            }
+
+            let finalOffset: CGFloat = offset
+
+            collectionView.cellForItem(at: IndexPath(item: item, section: section))?.frame.origin.y = max (originalAttributes[section][item].frame.minY + finalOffset, originalAttributes[section][0].frame.minY)
+
+            if gesture.state == .ended {
+                UIView.animate(withDuration: 0.3,
+                               delay: 0,
+                               usingSpringWithDamping: 3,
+                               initialSpringVelocity: 1,
+                               options: .curveEaseInOut,
+                               animations: {
+                                collectionView.cellForItem(at: IndexPath(item: item, section: section))?.frame = self.originalAttributes[section][item].frame
+                })
+            }
+        }
+    }
     
+}
+
+extension WalletFlowLayout: UIGestureRecognizerDelegate {
+
 }
 
 extension CGRect {

@@ -15,6 +15,7 @@ class ViewController: UIViewController {
         let flowLayout: WalletFlowLayout = WalletFlowLayout(delegate: self)
         let collectionView: UICollectionView = UICollectionView(frame: .zero,
                                                                 collectionViewLayout: flowLayout)
+        flowLayout.installGesture()
         let types: [UICollectionViewCell.Type] = [
             CryptoCardCell.self
         ]
