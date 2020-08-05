@@ -15,11 +15,16 @@ private struct UX {
 
 class ViewController: UIViewController {
 
+    private lazy var refreshControl: UIRefreshControl = {
+        let control = UIRefreshControl()
+        control.addTarget(self, action: #selector(refreshCard), for: .valueChanged)
+        return control
+    }()
+
     private lazy var collectionView: UICollectionView = {
         let flowLayout: WalletFlowLayout = WalletFlowLayout(delegate: self)
         let collectionView: UICollectionView = UICollectionView(frame: .zero,
                                                                 collectionViewLayout: flowLayout)
-//        flowLayout.installGesture()
         let types: [UICollectionViewCell.Type] = [
             CryptoCardCell.self
         ]
@@ -31,6 +36,7 @@ class ViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.backgroundColor = .white
         collectionView.showsVerticalScrollIndicator = false
+        collectionView.refreshControl = refreshControl
         return collectionView
     }()
 
@@ -42,6 +48,16 @@ class ViewController: UIViewController {
             $0.edges.equalTo(view.safeAreaLayoutGuide)
         }
 
+    }
+
+    @objc
+    private func refreshCard() {
+        collectionView.isUserInteractionEnabled = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.refreshControl.endRefreshing()
+            self.collectionView.isUserInteractionEnabled = true
+            self.collectionView.reloadData()
+        }
     }
 
 }
