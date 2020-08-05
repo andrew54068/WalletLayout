@@ -9,13 +9,17 @@
 import UIKit
 import SnapKit
 
+private struct UX {
+    static let cardOffset: CGFloat = 41
+}
+
 class ViewController: UIViewController {
 
     private lazy var collectionView: UICollectionView = {
         let flowLayout: WalletFlowLayout = WalletFlowLayout(delegate: self)
         let collectionView: UICollectionView = UICollectionView(frame: .zero,
                                                                 collectionViewLayout: flowLayout)
-        flowLayout.installGesture()
+//        flowLayout.installGesture()
         let types: [UICollectionViewCell.Type] = [
             CryptoCardCell.self
         ]
@@ -26,6 +30,7 @@ class ViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.backgroundColor = .white
+        collectionView.showsVerticalScrollIndicator = false
         return collectionView
     }()
 
@@ -48,12 +53,13 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return 30
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(CryptoCardCell.self), for: indexPath)
         cell.contentView.backgroundColor = [UIColor.red, UIColor.blue, UIColor.yellow, UIColor.black, UIColor.brown][indexPath.item % 5]
+//        cell.contentView.backgroundColor = .white
         return cell
     }
 
@@ -61,10 +67,21 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
         cell.layer.zPosition = CGFloat(indexPath.item)
         if indexPath.item > 0 {
             cell.layer.shadowColor = UIColor.black.cgColor
-            cell.layer.shadowOffset = .init(width: 1, height: 1)
+            cell.layer.shadowOffset = .init(width: 0, height: -1)
             cell.layer.shadowPath = UIBezierPath(roundedRect: cell.layer.bounds, byRoundingCorners: .allCorners, cornerRadii: CGSize(width: 10, height: 10)).cgPath
-            cell.layer.shadowRadius = 10
-            cell.layer.shadowOpacity = 0.2
+            cell.layer.shadowRadius = 0.5
+            cell.layer.shadowOpacity = 0.15
+        }
+
+        let numberOfItems = self.collectionView(collectionView, numberOfItemsInSection: indexPath.section)
+        if indexPath.item == max(numberOfItems - 1, 0) {
+            let additionShadowLayer: CALayer = .init()
+            additionShadowLayer.shadowColor = UIColor.black.cgColor
+            additionShadowLayer.shadowOffset = .init(width: 0, height: 10)
+            additionShadowLayer.shadowPath = UIBezierPath(roundedRect: cell.layer.bounds, byRoundingCorners: .allCorners, cornerRadii: CGSize(width: 10, height: 10)).cgPath
+            additionShadowLayer.shadowRadius = 5
+            additionShadowLayer.shadowOpacity = 0.1
+            cell.layer.insertSublayer(additionShadowLayer, at: 0)
         }
     }
 
@@ -82,11 +99,20 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return .init(top: 10, left: 15, bottom: 10, right: 15)
+        return .init(top: 50, left: 15, bottom: 50, right: 15)
     }
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: WalletFlowLayout, offsetFromPreviousCardTop atIndexPath: IndexPath) -> CGFloat {
-        return 50
+    // MARK: - WalletFlowLayoutDelegate
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: WalletFlowLayout, offsetFromPreviousCardTopAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.item == 0 {
+            return 0
+        }
+        return UX.cardOffset
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: WalletFlowLayout, distanceToVisualTop: CGFloat, at indexPath: IndexPath) {
+        let cell = collectionView.cellForItem(at: indexPath)
+        cell?.layer.shadowOpacity = Float(0.15 * min(distanceToVisualTop, UX.cardOffset) / UX.cardOffset)
     }
 
 }
