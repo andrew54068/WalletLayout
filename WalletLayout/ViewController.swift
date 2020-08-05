@@ -75,13 +75,7 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
 
         let numberOfItems = self.collectionView(collectionView, numberOfItemsInSection: indexPath.section)
         if indexPath.item == max(numberOfItems - 1, 0) {
-            let additionShadowLayer: CALayer = .init()
-            additionShadowLayer.shadowColor = UIColor.black.cgColor
-            additionShadowLayer.shadowOffset = .init(width: 0, height: 10)
-            additionShadowLayer.shadowPath = UIBezierPath(roundedRect: cell.layer.bounds, byRoundingCorners: .allCorners, cornerRadii: CGSize(width: 10, height: 10)).cgPath
-            additionShadowLayer.shadowRadius = 5
-            additionShadowLayer.shadowOpacity = 0.1
-            cell.layer.insertSublayer(additionShadowLayer, at: 0)
+            (cell as? CryptoCardCell)?.addAdditionalShadowLayer()
         }
     }
 

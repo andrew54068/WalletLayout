@@ -20,6 +20,8 @@ class CryptoCardCell: UICollectionViewCell {
         return label
     }()
 
+    private let additionShadowLayer: CALayer = .init()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -41,6 +43,20 @@ class CryptoCardCell: UICollectionViewCell {
             $0.top.equalToSuperview().offset(10)
             $0.leading.equalToSuperview().offset(10)
         }
+    }
+
+    func addAdditionalShadowLayer() {
+        additionShadowLayer.shadowColor = UIColor.black.cgColor
+        additionShadowLayer.shadowOffset = .init(width: 0, height: 10)
+        additionShadowLayer.shadowPath = UIBezierPath(roundedRect: layer.bounds, byRoundingCorners: .allCorners, cornerRadii: CGSize(width: 10, height: 10)).cgPath
+        additionShadowLayer.shadowRadius = 5
+        additionShadowLayer.shadowOpacity = 0.1
+        layer.insertSublayer(additionShadowLayer, at: 0)
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        additionShadowLayer.removeFromSuperlayer()
     }
 
 }
