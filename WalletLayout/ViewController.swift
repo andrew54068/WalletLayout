@@ -13,6 +13,12 @@ private struct UX {
     static let cardOffset: CGFloat = 41
 }
 
+struct CardModel {
+    var movable: Bool
+    let cardTitle: String
+    let color: UIColor
+}
+
 class ViewController: UIViewController {
 
     private lazy var refreshControl: UIRefreshControl = {
@@ -21,12 +27,30 @@ class ViewController: UIViewController {
         return control
     }()
 
+    private var useCustomLayout: Bool = false
+
+    var offsetForCollectionViewCellBeingMoved: CGPoint = .zero
+    var cellBeenDragged: EditCryptoCardCell?
+
+    var dataSource: [CardModel] = [
+        CardModel(movable: true, cardTitle: "Ethereum", color: .systemYellow),
+        CardModel(movable: true, cardTitle: "Tron", color: .systemRed),
+        CardModel(movable: false, cardTitle: "Flow", color: .systemPurple),
+        CardModel(movable: false, cardTitle: "Bitcoin", color: .gray),
+        CardModel(movable: false, cardTitle: "Crypto.com", color: .systemOrange)
+    ]
+
+    private lazy var flowLayout: WalletFlowLayout = WalletFlowLayout(delegate: self)
+
     private lazy var collectionView: UICollectionView = {
-        let flowLayout: WalletFlowLayout = WalletFlowLayout(delegate: self)
+//        let collectionView: UICollectionView = UICollectionView(frame: .zero,
+//                                                                collectionViewLayout: flowLayout)
+
         let collectionView: UICollectionView = UICollectionView(frame: .zero,
-                                                                collectionViewLayout: flowLayout)
+                                                                collectionViewLayout: UICollectionViewFlowLayout())
         let types: [UICollectionViewCell.Type] = [
-            CryptoCardCell.self
+            CryptoCardCell.self,
+            EditCryptoCardCell.self
         ]
         types.forEach {
             collectionView.register($0, forCellWithReuseIdentifier: NSStringFromClass($0))
@@ -37,7 +61,18 @@ class ViewController: UIViewController {
         collectionView.backgroundColor = .white
         collectionView.showsVerticalScrollIndicator = false
         collectionView.refreshControl = refreshControl
+//        collectionView.backgroundColor = .systemGray2
         return collectionView
+    }()
+
+    private lazy var tableView: UITableView = {
+        let table: UITableView = .init()
+        table.delegate = self
+        table.dataSource = self
+        table.rowHeight = 100
+        table.register(UITableViewCell.self, forCellReuseIdentifier: NSStringFromClass(UITableViewCell.self))
+        table.allowsSelection = true
+        return table
     }()
 
     override func viewDidLoad() {
@@ -45,9 +80,30 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints {
-            $0.edges.equalTo(view.safeAreaLayoutGuide)
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.leading.trailing.equalTo(view.safeAreaLayoutGuide)
         }
 
+//        view.addSubview(tableView)
+//        tableView.snp.makeConstraints {
+//            $0.top.equalTo(view.readableContentGuide)
+//            $0.bottom.leading.trailing.equalTo(view.readableContentGuide)
+//        }
+
+
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        let animate: UIBarButtonItem = .init(title: "animate", style: .done, target: self, action: #selector(animateLayout))
+        navigationItem.setRightBarButton(animate, animated: true)
+
+        let gesture: UILongPressGestureRecognizer = .init(target: self, action: #selector(ViewController.handleLongGesture(recognizer:)))
+        gesture.minimumPressDuration = 0.5
+        gesture.delegate = self
+        collectionView.addGestureRecognizer(gesture)
+
+//        tableView.setEditing(true, animated: true)
     }
 
     @objc
@@ -60,6 +116,91 @@ class ViewController: UIViewController {
         }
     }
 
+    @objc
+    private func animateLayout() {
+        useCustomLayout.toggle()
+        if useCustomLayout {
+            collectionView.setCollectionViewLayout(flowLayout, animated: true)
+        } else {
+            collectionView.setCollectionViewLayout(UICollectionViewFlowLayout(), animated: true)
+        }
+    }
+
+    @objc
+    func handleLongGesture(recognizer: UILongPressGestureRecognizer) {
+
+        guard let selectedIndexPath = self.collectionView.indexPathForItem(at: recognizer.location(in: recognizer.view)),
+            let cell: EditCryptoCardCell = collectionView.cellForItem(at: selectedIndexPath) as? EditCryptoCardCell else {
+                cellBeenDragged?.updateStyle(style: .normal)
+                collectionView.endInteractiveMovement()
+                return
+        }
+        switch recognizer.state {
+        case .began:
+            guard cell.canDrag(by: recognizer.location(in: cell)) else { return }
+
+            collectionView.beginInteractiveMovementForItem(at: selectedIndexPath)
+
+            // This is the class variable I mentioned above
+            offsetForCollectionViewCellBeingMoved = offsetOfTouchFrom(recognizer: recognizer, inCell: cell)
+
+            // This is the vanilla location of the touch that alone would make the cell's center snap to your touch location
+            var location = recognizer.location(in: collectionView)
+
+            /* These two lines add the offset calculated a couple lines up to
+            the normal location to make it so you can drag from any part of the
+            cell and have it stay where your finger is. */
+
+            location.x += offsetForCollectionViewCellBeingMoved.x
+            location.y += offsetForCollectionViewCellBeingMoved.y
+
+            collectionView.updateInteractiveMovementTargetPosition(location)
+
+            guard let selectedIndexPath = self.collectionView
+                .indexPathForItem(at: recognizer
+                    .location(in: self.collectionView)) else { break }
+            collectionView.beginInteractiveMovementForItem(at: selectedIndexPath)
+
+        case .changed:
+//            collectionView.updateInteractiveMovementTargetPosition(offsetOfTouchFrom(recognizer: gesture, inCell: cell))
+//
+//            var location = recognizer.location(in: collectionView)
+//
+//            location.x += offsetForCollectionViewCellBeingMoved.x
+//            location.y += offsetForCollectionViewCellBeingMoved.y
+//
+//            collectionView.updateInteractiveMovementTargetPosition(location)
+
+            var gesturePosition = recognizer.location(in: recognizer.view!)
+            gesturePosition.x = collectionView.center.x
+
+
+            collectionView.updateInteractiveMovementTargetPosition(recognizer.location(in: recognizer.view))
+        case .ended:
+            collectionView.endInteractiveMovement()
+        default:
+            collectionView.cancelInteractiveMovement()
+        }
+    }
+
+    private func offsetOfTouchFrom(recognizer: UIGestureRecognizer, inCell cell: UICollectionViewCell) -> CGPoint {
+
+        let locationOfTouchInCell = recognizer.location(in: cell)
+
+        let cellCenterX = cell.frame.width / 2
+        let cellCenterY = cell.frame.height / 2
+
+        let cellCenter = CGPoint(x: cellCenterX, y: cellCenterY)
+
+        var offSetPoint = CGPoint.zero
+
+        offSetPoint.y = cellCenter.y - locationOfTouchInCell.y
+        offSetPoint.x = cellCenter.x - locationOfTouchInCell.x
+
+        return offSetPoint
+
+    }
+
 }
 
 extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
@@ -69,29 +210,39 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 30
+        return dataSource.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(CryptoCardCell.self), for: indexPath)
-        cell.contentView.backgroundColor = [UIColor.red, UIColor.blue, UIColor.yellow, UIColor.black, UIColor.brown][indexPath.item % 5]
+        let cell: UICollectionViewCell
+        if useCustomLayout {
+            cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(CryptoCardCell.self), for: indexPath)
+//            cell.contentView.backgroundColor = [UIColor.systemYellow, UIColor.magenta, UIColor.systemIndigo, UIColor.gray, UIColor.systemOrange][indexPath.item % 5]
+        } else {
+            cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(EditCryptoCardCell.self), for: indexPath)
+            (cell as? EditCryptoCardCell)?.updateStyle(style: dataSource[indexPath.item].movable ? .normal : .disable)
+        }
+        cell.contentView.backgroundColor = dataSource[indexPath.item].color
+
 //        cell.contentView.backgroundColor = .white
         return cell
     }
 
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        cell.layer.zPosition = CGFloat(indexPath.item)
-        if indexPath.item > 0 {
-            cell.layer.shadowColor = UIColor.black.cgColor
-            cell.layer.shadowOffset = .init(width: 0, height: -1)
-            cell.layer.shadowPath = UIBezierPath(roundedRect: cell.layer.bounds, byRoundingCorners: .allCorners, cornerRadii: CGSize(width: 10, height: 10)).cgPath
-            cell.layer.shadowRadius = 0.5
-            cell.layer.shadowOpacity = 0.15
-        }
+        if useCustomLayout {
+            cell.layer.zPosition = CGFloat(indexPath.item)
+            if indexPath.item > 0 {
+                cell.layer.shadowColor = UIColor.black.cgColor
+                cell.layer.shadowOffset = .init(width: 0, height: -1)
+                cell.layer.shadowPath = UIBezierPath(roundedRect: cell.layer.bounds, byRoundingCorners: .allCorners, cornerRadii: CGSize(width: 10, height: 10)).cgPath
+                cell.layer.shadowRadius = 0.5
+                cell.layer.shadowOpacity = 0.15
+            }
 
-        let numberOfItems = self.collectionView(collectionView, numberOfItemsInSection: indexPath.section)
-        if indexPath.item == max(numberOfItems - 1, 0) {
-            (cell as? CryptoCardCell)?.addAdditionalShadowLayer()
+            let numberOfItems = self.collectionView(collectionView, numberOfItemsInSection: indexPath.section)
+            if indexPath.item == max(numberOfItems - 1, 0) {
+                (cell as? CryptoCardCell)?.addAdditionalShadowLayer()
+            }
         }
     }
 
@@ -100,17 +251,88 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.bounds.width - 30,
-                      height: (collectionView.bounds.width - 30) / 16 * 10)
+        if collectionViewLayout == flowLayout {
+            return CGSize(width: collectionView.bounds.width - 30,
+                          height: (collectionView.bounds.width - 30) / 16 * 10)
+        } else {
+            return CGSize(width: collectionView.bounds.width,
+                          height: 126)
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 10
+        if collectionViewLayout == flowLayout {
+            return 10
+        } else {
+            return 0
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return .init(top: 50, left: 15, bottom: 50, right: 15)
+        if collectionViewLayout == flowLayout {
+            return .init(top: 40, left: 15, bottom: 50, right: 15)
+        } else {
+            return .zero
+        }
     }
+
+    func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
+        if dataSource[indexPath.item].movable {
+            cellBeenDragged = collectionView.cellForItem(at: indexPath) as? EditCryptoCardCell
+        }
+        return dataSource[indexPath.item].movable
+    }
+
+    func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+
+        let model: CardModel = dataSource.remove(at: sourceIndexPath.item)
+        dataSource.insert(model, at: destinationIndexPath.item)
+
+    }
+
+    func collectionView(_ collectionView: UICollectionView, targetIndexPathForMoveFromItemAt originalIndexPath: IndexPath, toProposedIndexPath proposedIndexPath: IndexPath) -> IndexPath {
+        if originalIndexPath.item == 0 {
+            if proposedIndexPath.item + 1 < dataSource.count {
+                if dataSource[proposedIndexPath.item + 1].movable {
+                    return proposedIndexPath
+                } else {
+                    if proposedIndexPath.item > 0 {
+                        if dataSource[proposedIndexPath.item - 1].movable {
+                            return proposedIndexPath
+                        } else {
+                            return originalIndexPath
+                        }
+                    } else {
+                        return proposedIndexPath
+                    }
+                }
+            } else {
+                if dataSource[proposedIndexPath.item - 1].movable {
+                    return proposedIndexPath
+                } else {
+                    return originalIndexPath
+                }
+            }
+        } else {
+//            let cell: EditCryptoCardCell? = collectionView.cellForItem(at: proposedIndexPath) as? EditCryptoCardCell
+            if dataSource[proposedIndexPath.item].movable {
+                cellBeenDragged?.updateStyle(style: .normal)
+                return proposedIndexPath
+            } else {
+                cellBeenDragged?.updateStyle(style: .dragDisable)
+                return originalIndexPath
+//                return IndexPath(item: dataSource.enumerated().first { !$1.movable }?.0 ?? 0,
+//                                 section: proposedIndexPath.section)
+            }
+        }
+
+    }
+
+
+
+//    func collectionView(_ collectionView: UICollectionView, transitionLayoutForOldLayout fromLayout: UICollectionViewLayout, newLayout toLayout: UICollectionViewLayout) -> UICollectionViewTransitionLayout {
+//
+//    }
 
     // MARK: - WalletFlowLayoutDelegate
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: WalletFlowLayout, offsetFromPreviousCardTopAt indexPath: IndexPath) -> CGFloat {
@@ -121,8 +343,50 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: WalletFlowLayout, distanceToVisualTop: CGFloat, at indexPath: IndexPath) {
+        guard indexPath.item != 0 else { return }
         let cell = collectionView.cellForItem(at: indexPath)
         cell?.layer.shadowOpacity = Float(0.15 * min(distanceToVisualTop, UX.cardOffset) / UX.cardOffset)
+    }
+
+}
+
+extension ViewController: UITableViewDelegate, UITableViewDataSource {
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        20
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(UITableViewCell.self), for: indexPath)
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+
+    }
+
+}
+
+extension ViewController: UIGestureRecognizerDelegate {
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        return true
+    }
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive press: UIPress) -> Bool {
+        return true
+    }
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive event: UIEvent) -> Bool {
+        return true
     }
 
 }

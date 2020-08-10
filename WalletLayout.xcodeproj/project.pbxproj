@@ -3,19 +3,20 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		B44C62B513AEBF3D518C8572 /* Pods_WalletLayout.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BC718544665980B00F85AF7 /* Pods_WalletLayout.framework */; };
 		C132DA8624D0183300239D7D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C132DA8524D0183300239D7D /* AppDelegate.swift */; };
-		C132DA8824D0183300239D7D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C132DA8724D0183300239D7D /* SceneDelegate.swift */; };
 		C132DA8A24D0183300239D7D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C132DA8924D0183300239D7D /* ViewController.swift */; };
 		C132DA8D24D0183300239D7D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C132DA8B24D0183300239D7D /* Main.storyboard */; };
 		C132DA8F24D0183600239D7D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C132DA8E24D0183600239D7D /* Assets.xcassets */; };
 		C132DA9224D0183600239D7D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C132DA9024D0183600239D7D /* LaunchScreen.storyboard */; };
 		C132DA9A24D01A6B00239D7D /* WalletFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C132DA9924D01A6B00239D7D /* WalletFlowLayout.swift */; };
 		C132DA9E24D01AC400239D7D /* CryptoCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C132DA9D24D01AC400239D7D /* CryptoCardCell.swift */; };
+		C1F3833424DBE76A00B270A9 /* EditCryptoCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F3833324DBE76A00B270A9 /* EditCryptoCardCell.swift */; };
+		C1F3833624DBFAB500B270A9 /* TestTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F3833524DBFAB500B270A9 /* TestTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,7 +25,6 @@
 		8BC718544665980B00F85AF7 /* Pods_WalletLayout.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_WalletLayout.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C132DA8224D0183300239D7D /* WalletLayout.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WalletLayout.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C132DA8524D0183300239D7D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		C132DA8724D0183300239D7D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		C132DA8924D0183300239D7D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		C132DA8C24D0183300239D7D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C132DA8E24D0183600239D7D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -32,6 +32,8 @@
 		C132DA9324D0183600239D7D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C132DA9924D01A6B00239D7D /* WalletFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletFlowLayout.swift; sourceTree = "<group>"; };
 		C132DA9D24D01AC400239D7D /* CryptoCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoCardCell.swift; sourceTree = "<group>"; };
+		C1F3833324DBE76A00B270A9 /* EditCryptoCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCryptoCardCell.swift; sourceTree = "<group>"; };
+		C1F3833524DBFAB500B270A9 /* TestTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,7 +54,6 @@
 				5498D86DD1632C337358F573 /* Pods-WalletLayout.debug.xcconfig */,
 				58E01141A3A1A276445C4695 /* Pods-WalletLayout.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -85,11 +86,12 @@
 		C132DA8424D0183300239D7D /* WalletLayout */ = {
 			isa = PBXGroup;
 			children = (
+				C1F3833524DBFAB500B270A9 /* TestTableViewCell.swift */,
 				C132DA8524D0183300239D7D /* AppDelegate.swift */,
-				C132DA8724D0183300239D7D /* SceneDelegate.swift */,
 				C132DA8924D0183300239D7D /* ViewController.swift */,
 				C132DA9924D01A6B00239D7D /* WalletFlowLayout.swift */,
 				C132DA9D24D01AC400239D7D /* CryptoCardCell.swift */,
+				C1F3833324DBE76A00B270A9 /* EditCryptoCardCell.swift */,
 				C132DA8B24D0183300239D7D /* Main.storyboard */,
 				C132DA8E24D0183600239D7D /* Assets.xcassets */,
 				C132DA9024D0183600239D7D /* LaunchScreen.storyboard */,
@@ -217,7 +219,8 @@
 				C132DA9A24D01A6B00239D7D /* WalletFlowLayout.swift in Sources */,
 				C132DA8A24D0183300239D7D /* ViewController.swift in Sources */,
 				C132DA8624D0183300239D7D /* AppDelegate.swift in Sources */,
-				C132DA8824D0183300239D7D /* SceneDelegate.swift in Sources */,
+				C1F3833424DBE76A00B270A9 /* EditCryptoCardCell.swift in Sources */,
+				C1F3833624DBFAB500B270A9 /* TestTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,7 +296,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -347,7 +350,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -365,6 +368,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6J2P9G72MN;
 				INFOPLIST_FILE = WalletLayout/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -384,6 +388,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6J2P9G72MN;
 				INFOPLIST_FILE = WalletLayout/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
