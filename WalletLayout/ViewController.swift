@@ -21,13 +21,42 @@ struct CardModel {
 
 class ViewController: UIViewController {
 
+    private lazy var purchaseButton: UIButton = {
+        let button: UIButton = .init(frame: CGRect(x: 0, y: 0, width: 125, height: 30))
+        button.setImage(UIImage(named: "icBuy20"), for: .normal)
+        button.setTitle("PURCHASE", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
+        button.titleLabel?.textAlignment = .center
+        button.addTarget(self, action: #selector(purchaseOnClick(_:)), for: .touchUpInside)
+        button.backgroundColor = .init(red: 19 / 255, green: 54 / 255, blue: 191 / 255, alpha: 1)
+        button.layer.cornerRadius = 15
+        button.clipsToBounds = true
+        button.setInsetBetween(4)
+        return button
+    }()
+
+    private lazy var purchaseButtonItem: UIBarButtonItem = {
+        let item: UIBarButtonItem = .init(customView: purchaseButton)
+        return item
+    }()
+
+    private lazy var settingButtonItem: UIBarButtonItem = {
+        let item: UIBarButtonItem = .init(image: UIImage(named: "ic22Gear"),
+                                          style: .plain,
+                                          target: self,
+                                          action: #selector(animateLayout))
+        item.tintColor = .black
+        return item
+    }()
+
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
         control.addTarget(self, action: #selector(refreshCard), for: .valueChanged)
         return control
     }()
 
-    private var useCustomLayout: Bool = false
+    private var useCustomLayout: Bool = true
 
     var offsetForCollectionViewCellBeingMoved: CGPoint = .zero
     var cellBeenDragged: EditCryptoCardCell?
@@ -43,11 +72,8 @@ class ViewController: UIViewController {
     private lazy var flowLayout: WalletFlowLayout = WalletFlowLayout(delegate: self)
 
     private lazy var collectionView: UICollectionView = {
-//        let collectionView: UICollectionView = UICollectionView(frame: .zero,
-//                                                                collectionViewLayout: flowLayout)
-
         let collectionView: UICollectionView = UICollectionView(frame: .zero,
-                                                                collectionViewLayout: UICollectionViewFlowLayout())
+                                                                collectionViewLayout: flowLayout)
         let types: [UICollectionViewCell.Type] = [
             CryptoCardCell.self,
             EditCryptoCardCell.self
@@ -61,7 +87,7 @@ class ViewController: UIViewController {
         collectionView.backgroundColor = .white
         collectionView.showsVerticalScrollIndicator = false
         collectionView.refreshControl = refreshControl
-//        collectionView.backgroundColor = .systemGray2
+        collectionView.backgroundColor = .systemGray
         return collectionView
     }()
 
@@ -77,33 +103,35 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        setUpNavigationBar()
+
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.bottom.leading.trailing.equalTo(view.safeAreaLayoutGuide)
         }
 
-//        view.addSubview(tableView)
-//        tableView.snp.makeConstraints {
-//            $0.top.equalTo(view.readableContentGuide)
-//            $0.bottom.leading.trailing.equalTo(view.readableContentGuide)
-//        }
-
-
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let animate: UIBarButtonItem = .init(title: "animate", style: .done, target: self, action: #selector(animateLayout))
-        navigationItem.setRightBarButton(animate, animated: true)
 
         let gesture: UILongPressGestureRecognizer = .init(target: self, action: #selector(ViewController.handleLongGesture(recognizer:)))
         gesture.minimumPressDuration = 0.5
         gesture.delegate = self
         collectionView.addGestureRecognizer(gesture)
+    }
 
-//        tableView.setEditing(true, animated: true)
+    private func setUpNavigationBar() {
+        navigationItem.setLeftBarButton(purchaseButtonItem, animated: true)
+        navigationItem.setRightBarButton(settingButtonItem, animated: true)
+    }
+
+    @objc
+    private func purchaseOnClick(_ sender: UIButton) {
+        let alert = UIAlertController(title: "test", message: nil, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 
     @objc
@@ -210,21 +238,18 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSource.count
+        return dataSource.count * 4
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: UICollectionViewCell
         if useCustomLayout {
             cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(CryptoCardCell.self), for: indexPath)
-//            cell.contentView.backgroundColor = [UIColor.systemYellow, UIColor.magenta, UIColor.systemIndigo, UIColor.gray, UIColor.systemOrange][indexPath.item % 5]
         } else {
             cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(EditCryptoCardCell.self), for: indexPath)
             (cell as? EditCryptoCardCell)?.updateStyle(style: dataSource[indexPath.item].movable ? .normal : .disable)
         }
-        cell.contentView.backgroundColor = dataSource[indexPath.item].color
-
-//        cell.contentView.backgroundColor = .white
+        cell.contentView.backgroundColor = dataSource[indexPath.item % 5].color
         return cell
     }
 
@@ -346,6 +371,16 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
         guard indexPath.item != 0 else { return }
         let cell = collectionView.cellForItem(at: indexPath)
         cell?.layer.shadowOpacity = Float(0.15 * min(distanceToVisualTop, UX.cardOffset) / UX.cardOffset)
+    }
+
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+//        if targetContentOffset.pointee.y <= 0, !refreshControl.isRefreshing {
+//            navigationController?.setNavigationBarHidden(false, animated: true)
+//        }
+    }
+
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+
     }
 
 }
