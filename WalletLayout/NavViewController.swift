@@ -7,14 +7,17 @@
 //
 
 import UIKit
+//import AMScrollingNavbar
+//import GTScrollNavigationBar
 
 class NavViewController: UINavigationController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        hidesBarsOnSwipe = true
-        // Do any additional setup after loading the view.
+//        hidesBarsOnSwipe = true
+//
+//        barHideOnSwipeGestureRecognizer.addTarget(self, action: <#T##Selector#>)
+//         Do any additional setup after loading the view.
     }
-
 
 }

@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+//import AMScrollingNavbar
 
 private struct UX {
     static let cardOffset: CGFloat = 41
@@ -71,9 +72,21 @@ class ViewController: UIViewController {
 
     private lazy var flowLayout: WalletFlowLayout = WalletFlowLayout(delegate: self)
 
+    private lazy var tabView: TabView = {
+        let tabview: TabView = TabView(tabs: [.tokens, .collectibles])
+        tabview.delegate = self
+        return tabview
+    }()
+
     private lazy var collectionView: UICollectionView = {
-        let collectionView: UICollectionView = UICollectionView(frame: .zero,
-                                                                collectionViewLayout: flowLayout)
+        let collectionView: UICollectionView
+        if useCustomLayout {
+            collectionView = UICollectionView(frame: .zero,
+                                              collectionViewLayout: flowLayout)
+        } else {
+            collectionView = UICollectionView(frame: .zero,
+                                              collectionViewLayout: UICollectionViewFlowLayout())
+        }
         let types: [UICollectionViewCell.Type] = [
             CryptoCardCell.self,
             EditCryptoCardCell.self
@@ -105,9 +118,19 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         setUpNavigationBar()
 
+        view.addSubview(tabView)
+//        if let navigationBar = navigationController?.navigationBar {
+            tabView.snp.makeConstraints {
+                $0.top.equalTo(view.safeAreaLayoutGuide)
+//                $0.leading.equalTo(navigationBar)
+                $0.leading.width.equalTo(view)
+                $0.height.equalTo(42)
+            }
+//        }
+
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.top.equalTo(tabView.snp.bottom)
             $0.bottom.leading.trailing.equalTo(view.safeAreaLayoutGuide)
         }
 
@@ -115,11 +138,24 @@ class ViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        addGesture()
+//        if let navigationController = navigationController as? ScrollingNavigationController {
+//            navigationController.followScrollView(collectionView, delay: 0.0)
+//        }
+    }
 
-        let gesture: UILongPressGestureRecognizer = .init(target: self, action: #selector(ViewController.handleLongGesture(recognizer:)))
-        gesture.minimumPressDuration = 0.5
-        gesture.delegate = self
-        collectionView.addGestureRecognizer(gesture)
+    private func addGesture() {
+        if useCustomLayout {
+            let longPressGesture: UILongPressGestureRecognizer = .init(target: self, action: #selector(handleLongPressGesture(recognizer:)))
+            longPressGesture.minimumPressDuration = 0.3
+            longPressGesture.delegate = self
+            collectionView.addGestureRecognizer(longPressGesture)
+        } else {
+            let gesture: UILongPressGestureRecognizer = .init(target: self, action: #selector(handleGesture(recognizer:)))
+            gesture.delegate = self
+            collectionView.addGestureRecognizer(gesture)
+        }
+
     }
 
     private func setUpNavigationBar() {
@@ -137,10 +173,12 @@ class ViewController: UIViewController {
     @objc
     private func refreshCard() {
         collectionView.isUserInteractionEnabled = false
+//        collectionView.collectionViewLayout.invalidateLayout()
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.refreshControl.endRefreshing()
             self.collectionView.isUserInteractionEnabled = true
             self.collectionView.reloadData()
+            self.collectionView.collectionViewLayout.invalidateLayout()
         }
     }
 
@@ -155,7 +193,7 @@ class ViewController: UIViewController {
     }
 
     @objc
-    func handleLongGesture(recognizer: UILongPressGestureRecognizer) {
+    private func handleGesture(recognizer: UILongPressGestureRecognizer) {
 
         guard let selectedIndexPath = self.collectionView.indexPathForItem(at: recognizer.location(in: recognizer.view)),
             let cell: EditCryptoCardCell = collectionView.cellForItem(at: selectedIndexPath) as? EditCryptoCardCell else {
@@ -211,6 +249,36 @@ class ViewController: UIViewController {
         }
     }
 
+    @objc
+    private func handleLongPressGesture(recognizer: UILongPressGestureRecognizer) {
+        let location: CGPoint = recognizer.location(in: collectionView)
+        guard let locationIndexPath: IndexPath = collectionView.indexPathForItem(at: location),
+            let cell: CryptoCardCell = collectionView.cellForItem(at: locationIndexPath) as? CryptoCardCell else { return }
+
+        func animate(ended: Bool) {
+            UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
+                if ended {
+                    cell.transform = .identity
+                } else {
+                    cell.transform = .init(translationX: 0, y: -20)
+                }
+            }, completion: { finished in
+
+            })
+        }
+
+        switch recognizer.state {
+        case .began:
+            animate(ended: false)
+        case .ended,
+             .cancelled,
+             .changed:
+            animate(ended: true)
+        default:
+            ()
+        }
+    }
+
     private func offsetOfTouchFrom(recognizer: UIGestureRecognizer, inCell cell: UICollectionViewCell) -> CGPoint {
 
         let locationOfTouchInCell = recognizer.location(in: cell)
@@ -238,7 +306,7 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSource.count * 4
+        return dataSource.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -379,10 +447,6 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
 //        }
     }
 
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-
-    }
-
 }
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
@@ -422,6 +486,131 @@ extension ViewController: UIGestureRecognizerDelegate {
 
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive event: UIEvent) -> Bool {
         return true
+    }
+
+}
+
+extension ViewController: TabViewDelegate {
+
+    func tabSelected(tab: TabInfoType) {
+        switch tab {
+        case .tokens:
+            ()
+        case .collectibles:
+            ()
+        }
+    }
+
+}
+
+enum TabInfoType: Equatable {
+    case tokens
+    case collectibles
+
+    var title: String{
+        switch self {
+        case .tokens:
+            return "Tokens"
+        case .collectibles:
+            return "Collectibles"
+        }
+    }
+}
+
+protocol TabViewDelegate: AnyObject {
+    func tabSelected(tab: TabInfoType)
+}
+
+class TabView: UIView {
+
+    private let tabTypes: [TabInfoType]
+    private var buttons: [UIButton] = []
+
+    weak var delegate: TabViewDelegate?
+
+    private lazy var container: UIStackView = {
+        let stack: UIStackView = .init()
+        stack.distribution = .fill
+        stack.alignment = .center
+        stack.spacing = 16
+        return stack
+    }()
+
+    private var indicator: UIView = {
+        let view = UIView()
+        view.backgroundColor = .blue
+        view.layer.cornerRadius = 1
+        view.clipsToBounds = true
+        return view
+    }()
+
+    init(tabs: [TabInfoType]) {
+        self.tabTypes = tabs
+        super.init(frame: .zero)
+        setupViews()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func setupViews() {
+        directionalLayoutMargins.leading = 16
+
+        addSubview(container)
+        container.snp.makeConstraints {
+            $0.leading.equalTo(self.snp.leadingMargin)
+            $0.top.bottom.trailing.equalTo(self)
+        }
+        tabTypes.enumerated().forEach {
+            let button = UIButton()
+            button.tag = $0
+            button.setTitle($1.title, for: .normal)
+            button.setImage(nil, for: .normal)
+            button.setTitleColor(UIColor(red: 20 / 255, green: 20 / 255, blue: 20 / 255, alpha: 0.2), for: .normal)
+            button.setTitleColor(UIColor(red: 20 / 255, green: 20 / 255, blue: 20 / 255, alpha: 1), for: .selected)
+            button.addTarget(self, action: #selector(onClick(_:)), for: .touchUpInside)
+            buttons.append(button)
+            container.addArrangedSubview(button)
+            container.setCustomSpacing(16, after: button)
+        }
+
+        let spacer = UIView()
+        container.addArrangedSubview(spacer)
+
+        addSubview(indicator)
+        indicator.snp.makeConstraints {
+            $0.leading.width.equalTo(buttons[0])
+            $0.bottom.equalTo(self)
+            $0.height.equalTo(4)
+        }
+
+        buttons[0].isSelected = true
+    }
+
+    @objc
+    private func onClick(_ sender: UIButton) {
+        buttons.forEach { $0.isSelected = false }
+        sender.isSelected = true
+        delegate?.tabSelected(tab: tabTypes[sender.tag])
+        animateIndicator(selectedTag: sender.tag)
+    }
+
+    private func animateIndicator(selectedTag: Int) {
+        UIView.animate(withDuration: 0.2,
+                       delay: 0,
+                       usingSpringWithDamping: 0.75,
+                       initialSpringVelocity: 0.1,
+                       options: .curveEaseInOut,
+                       animations: {
+                        self.indicator.snp.remakeConstraints {
+                            $0.leading.width.equalTo(self.buttons[selectedTag])
+                            $0.bottom.equalTo(self)
+                            $0.height.equalTo(4)
+                        }
+                        self.layoutIfNeeded()
+        },
+                       completion: nil)
     }
 
 }

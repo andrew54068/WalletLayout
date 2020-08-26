@@ -24,6 +24,7 @@ class TabBarViewController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
 //        tabBar.isHidden = true
 
 //        addChild(pipVC)

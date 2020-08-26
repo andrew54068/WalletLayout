@@ -1,16 +1,20 @@
 PODS:
+  - BonMot (5.5.1)
   - SnapKit (5.0.1)
 
 DEPENDENCIES:
+  - BonMot
   - SnapKit
 
 SPEC REPOS:
   trunk:
+    - BonMot
     - SnapKit
 
 SPEC CHECKSUMS:
+  BonMot: 0d179476725af81f622a6d9f660f43048070016a
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
 
-PODFILE CHECKSUM: 8fa34fcd413da640275c1fc02a390e871bbdfdc3
+PODFILE CHECKSUM: b090b5376c841530f7cea8b3badf9c487c0d74a8
 
 COCOAPODS: 1.9.3
