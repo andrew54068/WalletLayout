@@ -7,9 +7,6 @@ target 'WalletLayout' do
 
   # Pods for WalletLayout
   pod 'SnapKit'
-#  pod 'AMScrollingNavbar'
-#  pod 'GTScrollNavigationBar'
-#  pod 'HidingNavigationBar'
 
   pod 'BonMot'
   

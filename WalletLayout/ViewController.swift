@@ -8,7 +8,6 @@
 
 import UIKit
 import SnapKit
-//import AMScrollingNavbar
 
 private struct UX {
     static let cardOffset: CGFloat = 41
@@ -114,19 +113,18 @@ class ViewController: UIViewController {
         return table
     }()
 
+    var isScrollToTop: Bool = false
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpNavigationBar()
 
         view.addSubview(tabView)
-//        if let navigationBar = navigationController?.navigationBar {
-            tabView.snp.makeConstraints {
-                $0.top.equalTo(view.safeAreaLayoutGuide)
-//                $0.leading.equalTo(navigationBar)
-                $0.leading.width.equalTo(view)
-                $0.height.equalTo(42)
-            }
-//        }
+        tabView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.width.equalTo(view)
+            $0.height.equalTo(42)
+        }
 
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints {
@@ -136,12 +134,15 @@ class ViewController: UIViewController {
 
     }
 
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        // to make tabView animate
+        view.layoutIfNeeded()
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         addGesture()
-//        if let navigationController = navigationController as? ScrollingNavigationController {
-//            navigationController.followScrollView(collectionView, delay: 0.0)
-//        }
     }
 
     private func addGesture() {
@@ -306,7 +307,7 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSource.count
+        return dataSource.count * 5
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -442,9 +443,31 @@ extension ViewController: UICollectionViewDataSource, WalletFlowLayoutDelegate {
     }
 
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-//        if targetContentOffset.pointee.y <= 0, !refreshControl.isRefreshing {
+//        if velocity.y < 0 {
 //            navigationController?.setNavigationBarHidden(false, animated: true)
+//        } else {
+//            navigationController?.setNavigationBarHidden(true, animated: true)
 //        }
+    }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard !isScrollToTop else { return }
+        if scrollView.contentOffset.y < 10 {
+            navigationController?.setNavigationBarHidden(false, animated: true)
+        } else {
+            navigationController?.setNavigationBarHidden(true, animated: true)
+        }
+    }
+
+    func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
+        isScrollToTop = false
+    }
+
+
+    func scrollViewShouldScrollToTop(_ scrollView: UIScrollView) -> Bool {
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        isScrollToTop = true
+        return true
     }
 
 }
