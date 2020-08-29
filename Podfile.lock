@@ -1,20 +1,30 @@
 PODS:
   - BonMot (5.5.1)
+  - Kingfisher (5.15.0):
+    - Kingfisher/Core (= 5.15.0)
+  - Kingfisher/Core (5.15.0)
+  - RxSwift (5.1.1)
   - SnapKit (5.0.1)
 
 DEPENDENCIES:
   - BonMot
+  - Kingfisher
+  - RxSwift
   - SnapKit
 
 SPEC REPOS:
   trunk:
     - BonMot
+    - Kingfisher
+    - RxSwift
     - SnapKit
 
 SPEC CHECKSUMS:
   BonMot: 0d179476725af81f622a6d9f660f43048070016a
+  Kingfisher: 1acb67597a520c2d0310677e66d6e0af455ef757
+  RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
 
-PODFILE CHECKSUM: eb29aece784712e29ddcd39d6db17a1483d876a1
+PODFILE CHECKSUM: 0079527f81c83f71f430d3332fe479d8fb674288
 
 COCOAPODS: 1.9.3

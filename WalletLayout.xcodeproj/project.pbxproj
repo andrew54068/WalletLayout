@@ -20,6 +20,10 @@
 		C1D2C69524E3BEB400F26299 /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D2C69424E3BEB400F26299 /* TabBarViewController.swift */; };
 		C1D2C69724E666E700F26299 /* NavViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D2C69624E666E700F26299 /* NavViewController.swift */; };
 		C1D2C69A24E6800D00F26299 /* UIButtonExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D2C69924E6800D00F26299 /* UIButtonExtension.swift */; };
+		C1E7B25C24F75A2000E44F34 /* CollectibleViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E7B25B24F75A2000E44F34 /* CollectibleViewCell.swift */; };
+		C1E7B25E24F76CFA00E44F34 /* TokenListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E7B25D24F76CFA00E44F34 /* TokenListViewController.swift */; };
+		C1E7B26024F76F4C00E44F34 /* TabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E7B25F24F76F4C00E44F34 /* TabView.swift */; };
+		C1E7B26224F77D0600E44F34 /* CollectionAssetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E7B26124F77D0600E44F34 /* CollectionAssetViewController.swift */; };
 		C1F3833424DBE76A00B270A9 /* EditCryptoCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F3833324DBE76A00B270A9 /* EditCryptoCardCell.swift */; };
 		C1F3833624DBFAB500B270A9 /* TestTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F3833524DBFAB500B270A9 /* TestTableViewCell.swift */; };
 /* End PBXBuildFile section */
@@ -42,6 +46,10 @@
 		C1D2C69424E3BEB400F26299 /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		C1D2C69624E666E700F26299 /* NavViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavViewController.swift; sourceTree = "<group>"; };
 		C1D2C69924E6800D00F26299 /* UIButtonExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIButtonExtension.swift; sourceTree = "<group>"; };
+		C1E7B25B24F75A2000E44F34 /* CollectibleViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectibleViewCell.swift; sourceTree = "<group>"; };
+		C1E7B25D24F76CFA00E44F34 /* TokenListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenListViewController.swift; sourceTree = "<group>"; };
+		C1E7B25F24F76F4C00E44F34 /* TabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabView.swift; sourceTree = "<group>"; };
+		C1E7B26124F77D0600E44F34 /* CollectionAssetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionAssetViewController.swift; sourceTree = "<group>"; };
 		C1F3833324DBE76A00B270A9 /* EditCryptoCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCryptoCardCell.swift; sourceTree = "<group>"; };
 		C1F3833524DBFAB500B270A9 /* TestTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -100,10 +108,14 @@
 				C1F3833524DBFAB500B270A9 /* TestTableViewCell.swift */,
 				C132DA8524D0183300239D7D /* AppDelegate.swift */,
 				C132DA8924D0183300239D7D /* ViewController.swift */,
+				C1E7B25F24F76F4C00E44F34 /* TabView.swift */,
+				C1E7B25D24F76CFA00E44F34 /* TokenListViewController.swift */,
+				C1E7B26124F77D0600E44F34 /* CollectionAssetViewController.swift */,
 				C1004B6C24E1584400E14979 /* PIPViewController.swift */,
 				C1D2C69224E3BE4000F26299 /* SecViewController.swift */,
 				C132DA9924D01A6B00239D7D /* WalletFlowLayout.swift */,
 				C132DA9D24D01AC400239D7D /* CryptoCardCell.swift */,
+				C1E7B25B24F75A2000E44F34 /* CollectibleViewCell.swift */,
 				C1D2C69624E666E700F26299 /* NavViewController.swift */,
 				C1F3833324DBE76A00B270A9 /* EditCryptoCardCell.swift */,
 				C1D2C69424E3BEB400F26299 /* TabBarViewController.swift */,
@@ -238,14 +250,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1E7B26224F77D0600E44F34 /* CollectionAssetViewController.swift in Sources */,
 				C132DA9E24D01AC400239D7D /* CryptoCardCell.swift in Sources */,
 				C1D2C69A24E6800D00F26299 /* UIButtonExtension.swift in Sources */,
 				C132DA9A24D01A6B00239D7D /* WalletFlowLayout.swift in Sources */,
 				C132DA8A24D0183300239D7D /* ViewController.swift in Sources */,
+				C1E7B26024F76F4C00E44F34 /* TabView.swift in Sources */,
+				C1E7B25C24F75A2000E44F34 /* CollectibleViewCell.swift in Sources */,
 				C132DA8624D0183300239D7D /* AppDelegate.swift in Sources */,
 				C1D2C69524E3BEB400F26299 /* TabBarViewController.swift in Sources */,
 				C1D2C69324E3BE4000F26299 /* SecViewController.swift in Sources */,
 				C1D2C69724E666E700F26299 /* NavViewController.swift in Sources */,
+				C1E7B25E24F76CFA00E44F34 /* TokenListViewController.swift in Sources */,
 				C1004B6D24E1584400E14979 /* PIPViewController.swift in Sources */,
 				C1F3833424DBE76A00B270A9 /* EditCryptoCardCell.swift in Sources */,
 				C1F3833624DBFAB500B270A9 /* TestTableViewCell.swift in Sources */,

@@ -7,7 +7,8 @@ target 'WalletLayout' do
 
   # Pods for WalletLayout
   pod 'SnapKit'
-
+  pod 'RxSwift'
+  pod 'Kingfisher'
   pod 'BonMot'
   
 end

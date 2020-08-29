@@ -17,7 +17,7 @@ class NavViewController: UINavigationController {
 //        hidesBarsOnSwipe = true
 //
 //        barHideOnSwipeGestureRecognizer.addTarget(self, action: <#T##Selector#>)
-//         Do any additional setup after loading the view.
+//        Do any additional setup after loading the view.
     }
 
 }
