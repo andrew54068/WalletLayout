@@ -62,6 +62,8 @@ class ViewController: UIViewController {
     private let collectionAssetViewController = CollectionAssetViewController()
 
     private var isDragging: Bool = false
+    // https://stackoverflow.com/questions/19939030/how-to-solve-failed-to-determine-navigation-direction-for-scroll-bug
+    private var pageTransitioning: Bool = false
     private var offsetBeforeDrag: CGFloat = 0
 
     override func viewDidLoad() {
@@ -152,7 +154,14 @@ extension ViewController: UIPageViewControllerDelegate, UIPageViewControllerData
         }
     }
 
+    func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
+        pageTransitioning = true
+    }
+
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+        if finished {
+            pageTransitioning = false
+        }
         guard completed else { return }
         if pageViewController.viewControllers?.first?.view == tokenListViewController {
             tabView.selectIndex(index: 0)
@@ -189,6 +198,7 @@ extension ViewController: UIScrollViewDelegate {
 extension ViewController: TabViewDelegate {
 
     func tabSelected(tab: TabInfoType) {
+        guard !pageTransitioning else { return }
         switch tab {
         case .tokens:
             pageController.setViewControllers([tokenListViewController],
