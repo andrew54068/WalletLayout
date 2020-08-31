@@ -41,12 +41,19 @@ protocol TabViewDelegate: AnyObject {
 
 class TabView: UIView {
 
+    enum progressDirection {
+        case left
+        case right
+        case none
+    }
+
     private let tabTypes: [TabInfoType]
     private var buttons: [UIButton] = []
 
     weak var delegate: TabViewDelegate?
 
     var currentIndex: Int = 0
+    private var previousDirection: progressDirection = .none
 
     private lazy var animator: UIViewPropertyAnimator = .init(duration: 0.3, curve: .easeInOut)
 
@@ -117,19 +124,6 @@ class TabView: UIView {
     }
 
     private func animateIndicator(selectedTag: Int) {
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2,
-//                                                       delay: 0,
-//                                                       options: .curveEaseInOut,
-//                                                       animations: {
-//                                                        self.indicator.snp.remakeConstraints {
-//                                                            $0.leading.width.equalTo(self.buttons[selectedTag])
-//                                                            $0.bottom.equalTo(self)
-//                                                            $0.height.equalTo(4)
-//                                                        }
-//                                                        self.layoutIfNeeded()
-//        },
-//                                                       completion: nil)
-
         UIView.animate(withDuration: 0.2,
                        delay: 0,
                        usingSpringWithDamping: 0.75,
@@ -141,16 +135,22 @@ class TabView: UIView {
                             $0.bottom.equalTo(self)
                             $0.height.equalTo(4)
                         }
+                        // need to call setNeedsLayout to make sure indicator update correctly.
+                        self.setNeedsLayout()
                         self.layoutIfNeeded()
         },
                        completion: nil)
     }
 
     func selectIndex(index: Int) {
-        buttons.forEach { $0.isSelected = false }
-        buttons[index].isSelected = true
+        highlightButton(index: index)
         delegate?.tabSelected(tab: tabTypes[index])
         currentIndex = index
+    }
+
+    private func highlightButton(index: Int) {
+        buttons.forEach { $0.isSelected = false }
+        buttons[index].isSelected = true
     }
 
     func updateIndicatorPosition(progress: CGFloat) {
@@ -159,38 +159,70 @@ class TabView: UIView {
             return
         }
 
-        animate(from: currentIndex, progress: progress)
+        defineAnimation(from: currentIndex, progress: progress)
 
-        animator.fractionComplete = abs(progress)
+        var tempIndex = currentIndex
+        if progress > 0.5 {
+            tempIndex = min(tempIndex + 1, buttons.count - 1)
+        }
+
+        if progress < -0.5 {
+            tempIndex = max(tempIndex - 1, 0)
+        }
+        highlightButton(index: tempIndex)
+
+        if currentIndex == 0 {
+            animator.fractionComplete = max(0, progress)
+        } else {
+            animator.fractionComplete = abs(progress)
+        }
     }
 
-    var animationAssigned: Bool = false
+    private func defineAnimation(from index: Int, progress: CGFloat) {
+        let currentDirection = getProgressDirection(progress)
+        guard currentDirection != previousDirection else { return }
+        switch currentDirection {
+        case .right:
+            if index != 1 {
+                animator.addAnimations {
+                    self.indicator.snp.remakeConstraints {
+                        let nextIndex = min(index + 1, self.buttons.count - 1)
+                        $0.leading.width.equalTo(self.buttons[nextIndex])
+                        $0.bottom.equalTo(self)
+                        $0.height.equalTo(4)
+                    }
+                    // need to call setNeedsLayout to make sure indicator update correctly.
+                    self.setNeedsLayout()
+                    self.layoutIfNeeded()
+                }
+            }
+        case .left:
+            if index != 0 {
+                animator.addAnimations {
+                    self.indicator.snp.remakeConstraints {
+                        let nextIndex = max(index - 1, 0)
+                        $0.leading.width.equalTo(self.buttons[nextIndex])
+                        $0.bottom.equalTo(self)
+                        $0.height.equalTo(4)
+                    }
+                    // need to call setNeedsLayout to make sure indicator update correctly.
+                    self.setNeedsLayout()
+                    self.layoutIfNeeded()
+                }
+            }
+        case .none:
+            ()
+        }
+        previousDirection = currentDirection
+    }
 
-    private func animate(from index: Int, progress: CGFloat) {
-        if progress > 0 {
-            animator.addAnimations {
-                self.indicator.snp.remakeConstraints {
-                    let nextIndex = min(index + 1, self.buttons.count - 1)
-                    $0.leading.width.equalTo(self.buttons[nextIndex])
-                    $0.bottom.equalTo(self)
-                    $0.height.equalTo(4)
-                }
-                // need to call setNeedsLayout to make sure indicator update correctly.
-                self.setNeedsLayout()
-                self.layoutIfNeeded()
-            }
-        } else if progress < 0 {
-            animator.addAnimations {
-                self.indicator.snp.remakeConstraints {
-                    let nextIndex = max(index - 1, 0)
-                    $0.leading.width.equalTo(self.buttons[nextIndex])
-                    $0.bottom.equalTo(self)
-                    $0.height.equalTo(4)
-                }
-                // need to call setNeedsLayout to make sure indicator update correctly.
-                self.setNeedsLayout()
-                self.layoutIfNeeded()
-            }
+    private func getProgressDirection(_ value: CGFloat) -> progressDirection {
+        if value > 0 {
+            return .right
+        } else if value == 0 {
+            return .none
+        } else {
+            return .left
         }
     }
 
@@ -204,7 +236,6 @@ class TabView: UIView {
             animator.continueAnimation(withTimingParameters: nil, durationFactor: 0)
             return
         }
-        animate(from: currentIndex, progress: progress)
 
         animator.isReversed = abs(progress) < 0.5
         animator.continueAnimation(withTimingParameters: nil, durationFactor: 0)
@@ -218,7 +249,7 @@ class TabView: UIView {
             tempIndex = max(tempIndex - 1, 0)
         }
         selectIndex(index: tempIndex)
-
+        previousDirection = .none
     }
 
 }
