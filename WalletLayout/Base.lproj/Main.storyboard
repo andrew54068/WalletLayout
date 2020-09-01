@@ -54,6 +54,7 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
                     <connections>
+                        <segue destination="6WL-wD-C7E" kind="relationship" relationship="viewControllers" id="6tj-H4-MmN"/>
                         <segue destination="K1i-vW-aDq" kind="relationship" relationship="viewControllers" id="baT-ax-YZ4"/>
                         <segue destination="l3U-3I-fYK" kind="relationship" relationship="viewControllers" id="unb-NO-wvI"/>
                     </connections>
@@ -78,6 +79,22 @@
             </objects>
             <point key="canvasLocation" x="2009" y="481"/>
         </scene>
+        <!--Bookmarks View Controller-->
+        <scene sceneID="gm1-aS-vG9">
+            <objects>
+                <viewController id="95N-6A-dnp" customClass="BookmarksViewController" customModule="WalletLayout" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="V2e-DQ-P9F">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="Xbb-gG-LTZ"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="Qbr-eQ-PQ8"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="zXZ-qF-C2N" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2009" y="1242"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="LqL-IR-SdM">
             <objects>
@@ -98,6 +115,25 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="txb-vI-xqG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1099" y="481"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="cbK-81-Uyi">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="6WL-wD-C7E" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" systemItem="bookmarks" id="gle-1C-zYd"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="uA5-hG-YYk">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="95N-6A-dnp" kind="relationship" relationship="rootViewController" id="1KV-UV-GFo"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="yQ8-WV-kGV" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1099" y="1241"/>
         </scene>
     </scenes>
 </document>
