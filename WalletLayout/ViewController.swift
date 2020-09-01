@@ -114,7 +114,6 @@ class ViewController: UIViewController {
     private func setupScrollView() {
         // Disable PageViewController's ScrollView bounce
         let scrollView = pageController.view.subviews.compactMap { $0 as? UIScrollView }.first
-//        scrollView?.bounces = false
         scrollView?.delegate = self
     }
 
