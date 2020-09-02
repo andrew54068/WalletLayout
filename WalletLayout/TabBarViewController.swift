@@ -9,9 +9,38 @@
 import UIKit
 import SnapKit
 
+class PIPWindow: UIWindow {
+
+    lazy var pipVC: PIPViewController = .init()
+
+    init() {
+        super.init(frame: UIScreen.main.bounds)
+        backgroundColor = nil
+        windowLevel = UIWindow.Level(UIWindow.Level.alert.rawValue - 1)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        return frame.contains(point)
+    }
+
+    func presentPIP() {
+        rootViewController = pipVC
+        isHidden = false
+    }
+
+    func dismiss() {
+        rootViewController = nil
+        isHidden = true
+    }
+}
+
 class TabBarViewController: UITabBarController {
 
-    let pipVC: PIPViewController = .init()
+    private lazy var window: PIPWindow = .init()
 
     private var tabBarIsHidden: Bool = false
 
@@ -25,32 +54,18 @@ class TabBarViewController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        addChild(pipVC)
-        view.addSubview(pipVC.view)
-        view.bringSubviewToFront(tabBar)
-        layoutConstraint = pipVC.view.snp.prepareConstraints {
-            $0.top.equalTo(view)
-        }.first
-        layoutConstraint?.activate()
-
-        pipVC.view.snp.makeConstraints {
-            $0.leading.bottom.trailing.equalTo(view)
-        }
-        pipVC.didMove(toParent: self)
-        pipVC.view.addGestureRecognizer(gesture)
-        pipVC.view.alpha = 0
-
+        window.addGestureRecognizer(gesture)
     }
 
     @objc
     func presentPIP() {
-        layoutConstraint?.update(inset: 0)
-        pipVC.view.transform = .init(translationX: 0, y: 150)
+        window.presentPIP()
+        window.frame = .init(x: 0, y: 0, width: 300, height: 300)
+        window.transform = .init(translationX: 0, y: 150)
 
         animator.addAnimations {
-            self.pipVC.view.transform = .identity
-            self.pipVC.view.alpha = 1
+            self.window.transform = .identity
+            self.window.alpha = 1
 
             self.tabBar.transform = .init(translationX: 0, y: self.tabBar.bounds.height)
         }
@@ -70,9 +85,11 @@ class TabBarViewController: UITabBarController {
     }
 
     func removePIP() {
+        window.dismiss()
+
         animator.addAnimations {
-            self.pipVC.view.transform = .init(translationX: 0, y: 150)
-            self.pipVC.view.alpha = 0
+            self.window.transform = .init(translationX: 0, y: 150)
+            self.window.alpha = 0
 
             self.tabBar.transform = .identity
         }
@@ -114,13 +131,23 @@ class TabBarViewController: UITabBarController {
                 }
             }
             animator.addAnimations {
-                self.pipVC.view.transform = .init(translationX: 0, y: 150)
-                self.pipVC.view.alpha = 0
+                self.window.transform = .init(translationX: 0, y: 150)
+                self.window.alpha = 0
 
                 self.tabBar.transform = .identity
             }
             animator.fractionComplete = max(min(offset / tabBar.bounds.height, 1), 0)
         case .ended:
+            animator.addCompletion { animatingPosition in
+                switch animatingPosition {
+                case .end:
+                    self.tabBarIsHidden = false
+                case .start:
+                    self.tabBarIsHidden = true
+                default:
+                    ()
+                }
+            }
             animator.continueAnimation(withTimingParameters: nil, durationFactor: 0)
         default:
             ()

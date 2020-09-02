@@ -10,12 +10,12 @@ import UIKit
 
 class PIPViewController: UIViewController {
 
-    private lazy var showButton: UIButton = {
+    lazy var showButton: UIButton = {
         let button: UIButton = UIButton()
         button.setTitleColor(.black, for: .normal)
         button.setTitle("show bar", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.backgroundColor = .clear
+        button.backgroundColor = .blue
         button.layer.cornerRadius = 10
         button.clipsToBounds = true
         button.addTarget(self, action: #selector(showTabBar), for: .touchUpInside)
