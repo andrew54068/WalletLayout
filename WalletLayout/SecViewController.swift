@@ -20,7 +20,7 @@ class SecViewController: UIViewController {
 
     @objc
     func showPIP() {
-        (tabBarController as? TabBarViewController)?.presentPIP()
+        (tabBarController as? TabBarViewController)?.presentBrowser()
     }
 
 }

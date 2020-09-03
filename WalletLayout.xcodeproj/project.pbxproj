@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B44C62B513AEBF3D518C8572 /* Pods_WalletLayout.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BC718544665980B00F85AF7 /* Pods_WalletLayout.framework */; };
-		C1004B6D24E1584400E14979 /* PIPViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1004B6C24E1584400E14979 /* PIPViewController.swift */; };
+		C1004B6D24E1584400E14979 /* BrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1004B6C24E1584400E14979 /* BrowserViewController.swift */; };
 		C132DA8624D0183300239D7D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C132DA8524D0183300239D7D /* AppDelegate.swift */; };
 		C132DA8A24D0183300239D7D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C132DA8924D0183300239D7D /* ViewController.swift */; };
 		C132DA8D24D0183300239D7D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C132DA8B24D0183300239D7D /* Main.storyboard */; };
@@ -33,7 +33,7 @@
 		5498D86DD1632C337358F573 /* Pods-WalletLayout.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WalletLayout.debug.xcconfig"; path = "Target Support Files/Pods-WalletLayout/Pods-WalletLayout.debug.xcconfig"; sourceTree = "<group>"; };
 		58E01141A3A1A276445C4695 /* Pods-WalletLayout.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WalletLayout.release.xcconfig"; path = "Target Support Files/Pods-WalletLayout/Pods-WalletLayout.release.xcconfig"; sourceTree = "<group>"; };
 		8BC718544665980B00F85AF7 /* Pods_WalletLayout.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_WalletLayout.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C1004B6C24E1584400E14979 /* PIPViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PIPViewController.swift; sourceTree = "<group>"; };
+		C1004B6C24E1584400E14979 /* BrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserViewController.swift; sourceTree = "<group>"; };
 		C132DA8224D0183300239D7D /* WalletLayout.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WalletLayout.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C132DA8524D0183300239D7D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C132DA8924D0183300239D7D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -114,7 +114,7 @@
 				C1E7B25D24F76CFA00E44F34 /* TokenListViewController.swift */,
 				C1E4420824FD039800F02AA8 /* BookmarksViewController.swift */,
 				C1E7B26124F77D0600E44F34 /* CollectionAssetViewController.swift */,
-				C1004B6C24E1584400E14979 /* PIPViewController.swift */,
+				C1004B6C24E1584400E14979 /* BrowserViewController.swift */,
 				C1D2C69224E3BE4000F26299 /* SecViewController.swift */,
 				C132DA9924D01A6B00239D7D /* WalletFlowLayout.swift */,
 				C132DA9D24D01AC400239D7D /* CryptoCardCell.swift */,
@@ -266,7 +266,7 @@
 				C1D2C69324E3BE4000F26299 /* SecViewController.swift in Sources */,
 				C1D2C69724E666E700F26299 /* NavViewController.swift in Sources */,
 				C1E7B25E24F76CFA00E44F34 /* TokenListViewController.swift in Sources */,
-				C1004B6D24E1584400E14979 /* PIPViewController.swift in Sources */,
+				C1004B6D24E1584400E14979 /* BrowserViewController.swift in Sources */,
 				C1F3833424DBE76A00B270A9 /* EditCryptoCardCell.swift in Sources */,
 				C1F3833624DBFAB500B270A9 /* TestTableViewCell.swift in Sources */,
 			);

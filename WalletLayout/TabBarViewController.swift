@@ -11,13 +11,45 @@ import SnapKit
 
 class TabBarViewController: UITabBarController {
 
-    let pipVC: PIPViewController = .init()
+    private var browserToTopLayoutConstraint: Constraint?
+    private var browserToBottomLayoutConstraint: Constraint?
+    private var browserHeightLayoutConstraint: Constraint?
+
+    private lazy var browserViewController: BrowserViewController = {
+        let vc: BrowserViewController = .init()
+        vc.delegate = self
+
+        self.addChild(vc)
+        self.view.addSubview(vc.view)
+        self.view.bringSubviewToFront(tabBar)
+        self.browserToTopLayoutConstraint = vc.view.snp.prepareConstraints {
+            $0.top.equalTo(view)
+        }.first
+        self.browserToTopLayoutConstraint?.activate()
+
+        self.browserToBottomLayoutConstraint = vc.view.snp.prepareConstraints {
+            $0.bottom.equalTo(view)
+        }.first
+        self.browserToBottomLayoutConstraint?.activate()
+
+        vc.view.snp.makeConstraints {
+            $0.leading.trailing.equalTo(view)
+        }
+
+        vc.didMove(toParent: self)
+        vc.view.addGestureRecognizer(gesture)
+        vc.view.alpha = 0
+
+        // https://stackoverflow.com/a/53339022/7332815
+        self.viewControllers?.removeAll(where: { $0 is BrowserViewController })
+        return vc
+    }()
 
     private var tabBarIsHidden: Bool = false
 
-    private var layoutConstraint: Constraint?
-
     private let animator: UIViewPropertyAnimator = .init(duration: 0.3, curve: .easeInOut)
+
+    private var isInteractionAnimationAssigned: Bool = false
 
     private lazy var gesture: UIPanGestureRecognizer = .init(target: self, action: #selector(pan(_:)))
 
@@ -25,34 +57,15 @@ class TabBarViewController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        addChild(pipVC)
-        view.addSubview(pipVC.view)
-        view.bringSubviewToFront(tabBar)
-        layoutConstraint = pipVC.view.snp.prepareConstraints {
-            $0.top.equalTo(view)
-        }.first
-        layoutConstraint?.activate()
-
-        pipVC.view.snp.makeConstraints {
-            $0.leading.bottom.trailing.equalTo(view)
-        }
-        pipVC.didMove(toParent: self)
-        pipVC.view.addGestureRecognizer(gesture)
-        pipVC.view.alpha = 0
-
     }
 
     @objc
-    func presentPIP() {
-        layoutConstraint?.update(inset: 0)
-        pipVC.view.transform = .init(translationX: 0, y: 150)
+    func presentBrowser() {
+        browserViewController.view.transform = .init(translationX: 0, y: 150)
+        browserViewController.view.layoutIfNeeded()
 
         animator.addAnimations {
-            self.pipVC.view.transform = .identity
-            self.pipVC.view.alpha = 1
-
-            self.tabBar.transform = .init(translationX: 0, y: self.tabBar.bounds.height)
+            self.layoutChangeToFull()
         }
 
         animator.addCompletion { animatingPosition in
@@ -69,12 +82,9 @@ class TabBarViewController: UITabBarController {
         animator.startAnimation()
     }
 
-    func removePIP() {
+    func changeBrowserToPIP() {
         animator.addAnimations {
-            self.pipVC.view.transform = .init(translationX: 0, y: 150)
-            self.pipVC.view.alpha = 0
-
-            self.tabBar.transform = .identity
+            self.layoutChangeToPIP()
         }
 
         animator.addCompletion { animatingPosition in
@@ -86,9 +96,40 @@ class TabBarViewController: UITabBarController {
             default:
                 ()
             }
+            self.view.layoutIfNeeded()
+            self.browserViewController.view.layoutIfNeeded()
         }
 
         animator.startAnimation()
+    }
+
+    private func layoutChangeToFull() {
+        browserHeightLayoutConstraint?.deactivate()
+        browserToTopLayoutConstraint?.update(inset: 0)
+        browserToBottomLayoutConstraint?.update(inset: 0)
+        browserToTopLayoutConstraint?.activate()
+
+        browserViewController.view.transform = .identity
+        browserViewController.view.alpha = 1
+
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+        tabBar.transform = .init(translationX: 0, y: tabBar.bounds.height)
+    }
+
+    private func layoutChangeToPIP() {
+        browserToTopLayoutConstraint?.deactivate()
+        browserHeightLayoutConstraint?.deactivate()
+        browserHeightLayoutConstraint = browserViewController.view.snp.prepareConstraints {
+            $0.height.equalTo(56)
+        }.first
+        browserHeightLayoutConstraint?.activate()
+        browserToBottomLayoutConstraint?.update(inset: tabBar.bounds.height)
+
+        tabBar.transform = .identity
+
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
     }
 
     @objc
@@ -113,15 +154,31 @@ class TabBarViewController: UITabBarController {
                     offset = tabBar.bounds.height
                 }
             }
-            animator.addAnimations {
-                self.pipVC.view.transform = .init(translationX: 0, y: 150)
-                self.pipVC.view.alpha = 0
-
-                self.tabBar.transform = .identity
+            if !isInteractionAnimationAssigned {
+                animator.addAnimations {
+                    self.layoutChangeToPIP()
+                    self.isInteractionAnimationAssigned = true
+                }
+                animator.addCompletion { _ in
+                    self.isInteractionAnimationAssigned = false
+                }
             }
             animator.fractionComplete = max(min(offset / tabBar.bounds.height, 1), 0)
         case .ended:
             animator.continueAnimation(withTimingParameters: nil, durationFactor: 0)
+        default:
+            ()
+        }
+    }
+
+}
+
+extension TabBarViewController: BrowserViewControllerDelegate {
+
+    func browser(_ browserViewController: BrowserViewController, statusChangedTo status: BrowserStatus) {
+        switch status {
+        case .pip:
+            changeBrowserToPIP()
         default:
             ()
         }

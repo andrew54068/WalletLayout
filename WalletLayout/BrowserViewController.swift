@@ -1,5 +1,5 @@
 //
-//  PIPViewController.swift
+//  BrowserViewController.swift
 //  WalletLayout
 //
 //  Created by kidnapper on 2020/8/10.
@@ -8,7 +8,20 @@
 
 import UIKit
 
-class PIPViewController: UIViewController {
+protocol BrowserViewControllerDelegate: AnyObject {
+    func browser(_ browserViewController: BrowserViewController, statusChangedTo status: BrowserStatus)
+}
+
+enum BrowserStatus {
+    case fullScreen
+    case pip
+    case hide
+    case dismiss
+}
+
+class BrowserViewController: UIViewController {
+
+    weak var delegate: BrowserViewControllerDelegate?
 
     private lazy var showButton: UIButton = {
         let button: UIButton = UIButton()
@@ -18,9 +31,19 @@ class PIPViewController: UIViewController {
         button.backgroundColor = .clear
         button.layer.cornerRadius = 10
         button.clipsToBounds = true
-        button.addTarget(self, action: #selector(showTabBar), for: .touchUpInside)
+        button.addTarget(self, action: #selector(changeToPIP), for: .touchUpInside)
         return button
     }()
+
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nil, bundle: nil)
+        edgesForExtendedLayout = []
+        extendedLayoutIncludesOpaqueBars = false
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,8 +57,8 @@ class PIPViewController: UIViewController {
     }
 
     @objc
-    func showTabBar() {
-        (tabBarController as? TabBarViewController)?.removePIP()
+    private func changeToPIP(_ sender: UIButton) {
+        delegate?.browser(self, statusChangedTo: .pip)
     }
 
 }

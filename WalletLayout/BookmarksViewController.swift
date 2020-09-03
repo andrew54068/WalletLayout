@@ -33,7 +33,7 @@ class BookmarksViewController: UIViewController {
 
     @objc
     func showPIP(_ sender: UIButton) {
-        (tabBarController as! TabBarViewController).presentPIP()
+        (tabBarController as! TabBarViewController).presentBrowser()
     }
 
 }
